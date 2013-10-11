@@ -51,6 +51,8 @@ USE_TZ = True
 
 PROJECT_ROOT = Path(__file__).ancestor(2)
 
+APPS_ROOT = PROJECT_ROOT.child('apps')
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
 MEDIA_ROOT = PROJECT_ROOT.child('media')
@@ -111,6 +113,7 @@ ROOT_URLCONF = 'project.urls'
 WSGI_APPLICATION = 'project.wsgi.application'
 
 TEMPLATE_DIRS = (
+    APPS_ROOT.child('webstack', 'templates')
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -126,6 +129,7 @@ INSTALLED_APPS = (
     'grappelli',
     'django.contrib.admin',
     'south',
+    'apps.webstack',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
