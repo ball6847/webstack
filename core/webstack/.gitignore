@@ -1,0 +1,7 @@
+*.komodoproject
+.komodotools
+*.pyc
+
+/project/settings_local.py
+/static/admin
+/static/grappelli
