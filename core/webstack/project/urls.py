@@ -6,5 +6,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/',     include(admin.site.urls)),
+    url(r'^webstack/',  include('apps.webstack.urls')),
 )
