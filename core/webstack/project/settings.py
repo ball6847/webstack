@@ -49,7 +49,9 @@ USE_L10N = True
 USE_TZ = True
 
 
-PROJECT_ROOT = Path(__file__).ancestor(2)
+WEBSTACK_ROOT = Path(__file__).ancestor(4)
+
+PROJECT_ROOT = WEBSTACK_ROOT.child('core', 'webstack')
 
 APPS_ROOT = PROJECT_ROOT.child('apps')
 
