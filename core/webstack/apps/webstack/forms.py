@@ -5,25 +5,32 @@ import re
 
 class ProjectForm(forms.ModelForm):
     
-    def clean_domain(self):
-        return make_clean_filename(self.cleaned_data['domain'])
+    """ display path as readonly for existing object """
     
-    def validate(self):
-        data = super(ProjectForm, self).clean()
-        domain = data.get('domain')
-        path = data.get('path')
-        """
-        # use webstack path
+    def __init__(self, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            self.fields['path'].widget.attrs['readonly'] = True
+    
+    """ --------------------------------------------------------- """
+    
+    """ prevent user from updating path on existing object
+        use webstack's default on create new with empty value """
+        
+    def clean_path(self):
+        # prevent user from changing docroot on existing object
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.path
+        
+        domain = self.cleaned_data['domain']
+        path = self.cleaned_data['path']
+        
+        # use webstack's default
         if path == "":
             path = "/home/ball6847/webstack/www/" + re.sub(r"\.+", "_", domain)
-            path = Path(path)
-            path.mkdir()
-        else:
-            path = Path(path)
         
-        # directory must does exist before continue
-        if not path.exists():
-            raise forms.ValidationError("%s does not exist in filesystem" % path)
-        """
-        return data    
+        return path
     
+    """ --------------------------------------------------------- """

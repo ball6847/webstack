@@ -1,0 +1,23 @@
+<VirtualHost *:80>
+    ServerName {{ project.domain }}
+    DocumentRoot {{ project.path }}
+    
+	<Directory />
+		Options +FollowSymLinks
+		AllowOverride None
+	</Directory>
+    
+    <Directory "{{ project.path }}">
+        Options -Indexes +FollowSymLinks +MultiViews
+        AllowOverride None
+        Order allow,deny
+        allow from all
+        <IfVersion >= 2.4>
+        Require all granted
+        </IfVersion> 
+    </Directory>
+    
+    LogLevel warn
+    ErrorLog {{ project.apache_error_log }}
+    CustomLog {{ project.apache_access_log }} combined
+</VirtualHost>
