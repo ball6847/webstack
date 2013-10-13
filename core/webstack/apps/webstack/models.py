@@ -30,7 +30,7 @@ class Project(TimeStampedModel):
     
     def save(self, *args, **kwargs):
         # create directory before create object
-        if self.id == None:
+        if self.pk == None:
             path = Path(self.path)
             # @todo do not allowed create on root permission
             if not path.isdir():
@@ -46,30 +46,51 @@ class Project(TimeStampedModel):
                         gid = stat.st_gid
                         break
                     iterator = iterator.ancestor(1)
-                # create directory and correct its owner
+                # create all neccesary files and directories
+                self.apache_vhost_file().write_file('')
+                self.apache_access_log().write_file('')
+                self.apache_error_log().write_file('')
+                self.php_error_log().write_file('')
                 path.mkdir(True)
                 shell_exec(["chown", "-R", "%d:%d" % (uid, gid), iterator])
+        else:
+            # get its previous domain value, if it changes, rename it to new files
+            old = Project.objects.get(pk=self.pk)
+            if self.domain != old.domain:
+                old.apache_vhost_file().rename(self.apache_vhost_file())
+                old.apache_access_log().rename(self.apache_access_log())
+                old.apache_error_log().rename(self.apache_error_log())
+                old.php_error_log().rename(self.php_error_log())
                 
+        # update database, /etc/hosts and apache virtualhost then reload apache
         super(Project, self).save(*args, **kwargs)
         update_hostfile()
-        
-        # create or update vhostfile
-        Path(settings.WEBSTACK_ROOT, 'etc/apache2/conf.d/%s.conf' %
-            self.safe_domain_name()).write_file(
+        self.apache_vhost_file().write_file(
             render_to_string("vhost.html", {'project': self}))
         Apache().reload()
 
     def safe_domain_name(self):
         return re.sub(r"\.+", "_", self.domain)
 
+    def apache_vhost_file(self):
+        return Path(
+            settings.WEBSTACK_ROOT,
+            'etc/apache2/conf.d/%s.conf' % self.safe_domain_name())
+
     def apache_access_log(self):
-        return "%s/logs/www/%s-access.log" % (settings.WEBSTACK_ROOT, self.safe_domain_name())
+        return Path(
+            settings.WEBSTACK_ROOT,
+            "logs/www/%s-access.log" % self.safe_domain_name())
     
     def apache_error_log(self):
-        return "%s/logs/www/%s-error.log" % (settings.WEBSTACK_ROOT, self.safe_domain_name())
+        return Path(
+            settings.WEBSTACK_ROOT,
+            "logs/www/%s-error.log" % self.safe_domain_name())
     
     def php_error_log(self):
-        return "%s/logs/www/%s-error-php.log" % (settings.WEBSTACK_ROOT, self.safe_domain_name()) 
+        return Path(
+            settings.WEBSTACK_ROOT,
+            "logs/www/%s-error-php.log" % self.safe_domain_name())
     
 
 """ end webstack/models.py """
