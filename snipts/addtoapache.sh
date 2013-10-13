@@ -33,7 +33,7 @@ fi
 echo "Apache config dir = $configdir"
 
 if [[ $configdir = "/etc/apache2/conf-available/" ]] && [[ ! -f "/etc/apache2/conf-enabled/webstack.conf" ]]; then
-    a2enconf webstack
+    a2enconf webstack.conf
 fi
 
 # if it's not already in its place
