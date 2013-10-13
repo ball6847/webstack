@@ -6,4 +6,3 @@ django-grappelli
 south
 MySQL-python
 Unipath
-commandwrapper
