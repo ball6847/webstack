@@ -68,6 +68,17 @@ class Project(TimeStampedModel):
         self.apache_vhost_file().write_file(
             render_to_string("vhost.html", {'project': self}))
         Apache().reload()
+    
+    """ currently not used, will move this part to ProjectAdmin """
+    def _delete(self, *args, **kwargs):
+        super(Project, self).delete(*args, **kwargs)
+        self.apache_vhost_file().remove()
+        self.apache_access_log().remove()
+        self.apache_error_log().remove()
+        self.php_error_log().remove()
+        Path(self.path).rmdir()
+        update_hostfile()
+        Apache().reload()
 
     def safe_domain_name(self):
         return re.sub(r"\.+", "_", self.domain)
