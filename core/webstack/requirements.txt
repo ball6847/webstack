@@ -1,5 +1,7 @@
 Django
+django-admin-timestamps
 django-annoying
+django-extensions
 django-grappelli
 south
 MySQL-python
