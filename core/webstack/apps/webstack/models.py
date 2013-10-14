@@ -51,7 +51,7 @@ class Project(TimeStampedModel):
                 self.apache_access_log().write_file('')
                 self.apache_error_log().write_file('')
                 self.php_error_log().write_file('')
-                path.mkdir(True)
+                path.child('public').mkdir(True)
                 shell_exec(["chown", "-R", "%d:%d" % (uid, gid), iterator])
         else:
             # get its previous domain value, if it changes, rename it to new files
@@ -82,6 +82,9 @@ class Project(TimeStampedModel):
 
     def safe_domain_name(self):
         return re.sub(r"\.+", "_", self.domain)
+
+    def document_root(self):
+        return Path(self.path).child('public')
 
     def apache_vhost_file(self):
         return Path(
