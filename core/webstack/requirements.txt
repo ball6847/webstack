@@ -3,6 +3,7 @@ django-admin-timestamps
 django-annoying
 django-extensions
 django-grappelli
+gunicorn
 south
 MySQL-python
 Unipath
