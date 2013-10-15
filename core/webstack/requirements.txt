@@ -4,6 +4,7 @@ django-annoying
 django-extensions
 django-grappelli
 gunicorn
+setproctitle
 south
 MySQL-python
 Unipath
