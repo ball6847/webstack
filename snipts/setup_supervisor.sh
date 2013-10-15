@@ -11,7 +11,7 @@ USER_HOME="$(getent passwd $SUDO_USER | cut -d: -f6)"
 WEBSTACK_ROOT="$(cd "$(dirname "$0")" && cd .. && pwd)"
 SUPERVISOR_CONFD="/etc/supervisor/conf.d"
 
-# print deteced directory to user
+# print detected directory to user
 echo "USER_HOME=$USER_HOME"
 echo "WEBSTACK_ROOT=$WEBSTACK_ROOT"
 
@@ -41,7 +41,7 @@ else
     
     if [[ -f "$SUPERVISOR_CONFD/webstack.conf" ]]; then
         read -p "warning: Your previous configuration will be overwritten, are you sure with this? (y/n)" -n 1 -r
-        echo    # (optional) move to a new line
+        echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             echo "OK, exit"
             exit 1
