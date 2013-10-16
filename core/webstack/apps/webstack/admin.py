@@ -8,7 +8,7 @@ class ProjectAdmin(TimestampedAdminMixin, admin.ModelAdmin):
     list_display = ('domain', 'path', 'status',)
     list_filter = ('status',)
     search_fields = ('domain',)
-    ordering = ('id',)
+    ordering = ('domain',)
     form = ProjectForm
 
 admin.site.register(Project, ProjectAdmin)

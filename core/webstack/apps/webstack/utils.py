@@ -23,7 +23,7 @@ def update_hostfile():
     commentclose = "## webstack-end"
     
     # get all domain from all projects
-    projects = Project.objects.filter(status=True).order_by('created')
+    projects = Project.objects.filter(status=True).order_by('domain')
     
     # create hostfile entries
     buff = []
