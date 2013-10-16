@@ -10,6 +10,7 @@ fi
 USER_HOME="$(getent passwd $SUDO_USER | cut -d: -f6)"
 WEBSTACK_ROOT="$(cd "$(dirname "$0")" && cd .. && pwd)"
 SUPERVISOR_CONFD="/etc/supervisor/conf.d"
+VIRTUALENV="$USER_HOME/.virtualenvs/webstack"
 
 # print detected directory to user
 echo "USER_HOME=$USER_HOME"
@@ -22,7 +23,7 @@ if [[ ! -f "$WEBSTACK_ROOT/core/webstack/gunicorn_start.sh" ]]; then
 fi
 
 # check webstack virtualenv directory
-if [[ ! -d "$USER_HOME/.virtualenvs/webstack/bin" ]]; then
+if [[ ! -d "$VIRTUALENV/bin" ]]; then
     echo "error: not found .virtualenvs/webstack/bin directory in $USER_HOME"
     exit 1
 fi
@@ -58,13 +59,13 @@ echo "Configuring webstack for supervisor"
 
 # save configuration to file
 echo "[program:webstack]
-command=$WEBSTACK_ROOT/core/webstack/gunicorn_start.sh
+command=$VIRTUALENV/bin/python $VIRTUALENV/bin/gunicorn --name webstack --bind 127.0.0.1:6847 --error-logfile \"$WEBSTACK_ROOT/logs/core/gunicorn.log\" --log-level warning project.wsgi:application
 directory=$WEBSTACK_ROOT/core/webstack
-environment=PATH=\"$USER_HOME/.virtualenvs/webstack/bin:/usr/local/bin:/usr/bin:/bin\"
-process_name=%(program_name)s
+environment=PATH=\"$USER_HOME/.virtualenvs/webstack/bin:$PATH\"
+process_name=webstack
 redirect_stderr=true
 stdout_logfile=$WEBSTACK_ROOT/logs/core/supervisor.log
-stopsignal=KILL" > "$SUPERVISOR_CONFD/webstack.conf"
+stopasgroup=true  " > "$SUPERVISOR_CONFD/webstack.conf"
 
 echo "success: Webstack supervisor configuration saved at $SUPERVISOR_CONFD/webstack.conf"
 
