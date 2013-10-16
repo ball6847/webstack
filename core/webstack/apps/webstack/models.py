@@ -13,7 +13,6 @@ DomainValidator = RegexValidator(
     "Invalid domain, it should be something like domain.tld"
 )
 
-
 class Project(TimeStampedModel):
     domain = models.CharField(max_length=100,
                               blank=False,
@@ -47,21 +46,20 @@ class Project(TimeStampedModel):
                         break
                     iterator = iterator.ancestor(1)
                 # create all neccesary files and directories
+                path.child('public').mkdir(True)
+                path.child('logs').mkdir(True)
+                shell_exec(["chown", "-R", "%d:%d" % (uid, gid), iterator])
                 self.apache_vhost_file().write_file('')
                 self.apache_access_log().write_file('')
                 self.apache_error_log().write_file('')
                 self.php_error_log().write_file('')
-                path.child('public').mkdir(True)
-                shell_exec(["chown", "-R", "%d:%d" % (uid, gid), iterator])
+                
         else:
-            # get its previous domain value, if it changes, rename it to new files
+            # get its previous domain value, if it changes, rename virtualhost file
             old = Project.objects.get(pk=self.pk)
             if self.domain != old.domain:
                 old.apache_vhost_file().rename(self.apache_vhost_file())
-                old.apache_access_log().rename(self.apache_access_log())
-                old.apache_error_log().rename(self.apache_error_log())
-                old.php_error_log().rename(self.php_error_log())
-                
+            
         # update database, /etc/hosts and apache virtualhost then reload apache
         super(Project, self).save(*args, **kwargs)
         update_hostfile()
@@ -69,8 +67,8 @@ class Project(TimeStampedModel):
             render_to_string("vhost.html", {'project': self}))
         Apache().reload()
     
-    """ currently not used, will move this part to ProjectAdmin """
     def _delete(self, *args, **kwargs):
+        """ currently not used, will move this part to ProjectAdmin """
         super(Project, self).delete(*args, **kwargs)
         self.apache_vhost_file().remove()
         self.apache_access_log().remove()
@@ -83,6 +81,11 @@ class Project(TimeStampedModel):
     def safe_domain_name(self):
         return re.sub(r"\.+", "_", self.domain)
 
+    def get_path(self):
+        if self.unipath == None :
+            self.unipath = Path(self.path)
+        return self.unipath
+
     def document_root(self):
         return Path(self.path).child('public')
 
@@ -92,19 +95,13 @@ class Project(TimeStampedModel):
             'etc/apache2/conf.d/%s.conf' % self.safe_domain_name())
 
     def apache_access_log(self):
-        return Path(
-            settings.WEBSTACK_ROOT,
-            "logs/www/%s-access.log" % self.safe_domain_name())
+        return self.get_path().child('logs', 'access.log')
     
     def apache_error_log(self):
-        return Path(
-            settings.WEBSTACK_ROOT,
-            "logs/www/%s-error.log" % self.safe_domain_name())
+        return self.get_path().child('logs', 'error.log')
     
     def php_error_log(self):
-        return Path(
-            settings.WEBSTACK_ROOT,
-            "logs/www/%s-error-php.log" % self.safe_domain_name())
+        return self.get_path().child('logs', 'error-php.log')
     
 
 """ end webstack/models.py """
