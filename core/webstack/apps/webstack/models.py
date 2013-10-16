@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
 from django.core.validators import RegexValidator
 from django.template.loader import render_to_string
 from unipath import Path
 import re
-
 from .utils import shell_exec, update_hostfile, Apache
 
 DomainValidator = RegexValidator(
@@ -71,14 +72,9 @@ class Project(TimeStampedModel):
             render_to_string("vhost.html", {'project': self}))
         Apache().reload()
     
-    def _delete(self, *args, **kwargs):
-        """ currently not used, will move this part to ProjectAdmin """
-        super(Project, self).delete(*args, **kwargs)
+    def clean_all(self, *args, **kwargs):
         self.apache_vhost_file().remove()
-        self.apache_access_log().remove()
-        self.apache_error_log().remove()
-        self.php_error_log().remove()
-        Path(self.path).rmdir()
+        self.get_path().rmtree()
         update_hostfile()
         Apache().reload()
 
@@ -106,6 +102,13 @@ class Project(TimeStampedModel):
     
     def php_error_log(self):
         return self.get_path().child('logs', 'error-php.log')
-    
+
+""" end class Project """
+
+@receiver(pre_delete, sender=Project)
+def project_delete_handler(sender, **kwargs):
+    """ Signal handler called from Project Model to remove all files related to itself """
+    project = kwargs.get('instance')
+    print project.clean_all()
 
 """ end webstack/models.py """
