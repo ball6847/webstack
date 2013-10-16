@@ -9,7 +9,7 @@
     
     <Directory "{{ project.path }}">
         Options -Indexes +FollowSymLinks +MultiViews
-        AllowOverride None
+        AllowOverride All
         Order allow,deny
         allow from all
         <IfVersion >= 2.4>
