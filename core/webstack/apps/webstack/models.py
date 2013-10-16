@@ -22,6 +22,8 @@ class Project(TimeStampedModel):
                               blank=True)
     status = models.BooleanField(default=True)
     
+    _unipath = None
+    
     def __unicode__(self):
         return self.domain
     
@@ -48,12 +50,11 @@ class Project(TimeStampedModel):
                 # create all neccesary files and directories
                 path.child('public').mkdir(True)
                 path.child('logs').mkdir(True)
-                shell_exec(["chown", "-R", "%d:%d" % (uid, gid), iterator])
                 self.apache_vhost_file().write_file('')
                 self.apache_access_log().write_file('')
                 self.apache_error_log().write_file('')
                 self.php_error_log().write_file('')
-                
+                shell_exec(["chown", "-R", "%d:%d" % (uid, gid), iterator])
         else:
             # get its previous domain value, if it changes, rename virtualhost file
             old = Project.objects.get(pk=self.pk)
@@ -82,9 +83,9 @@ class Project(TimeStampedModel):
         return re.sub(r"\.+", "_", self.domain)
 
     def get_path(self):
-        if self.unipath == None :
-            self.unipath = Path(self.path)
-        return self.unipath
+        if self._unipath == None :
+            self._unipath = Path(self.path)
+        return self._unipath
 
     def document_root(self):
         return Path(self.path).child('public')
