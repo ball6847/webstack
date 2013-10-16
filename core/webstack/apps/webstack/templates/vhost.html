@@ -20,4 +20,9 @@
     LogLevel warn
     ErrorLog {{ project.apache_error_log }}
     CustomLog {{ project.apache_access_log }} combined
+	
+	# these values can be overridden from .htaccess
+	php_flag log_errors On
+	php_flag display_errors On
+	php_value error_log "{{ project.php_error_log }}"
 </VirtualHost>
