@@ -53,7 +53,10 @@ class Project(TimeStampedModel):
                 self.apache_vhost_file().write_file('')
                 self.apache_access_log().write_file('')
                 self.apache_error_log().write_file('')
+                # need 777 or apache won't sent errors here
                 self.php_error_log().write_file('')
+                self.php_error_log().chmod(0777)
+                # make files available to user
                 shell_exec(["chown", "-R", "%d:%d" % (uid, gid), iterator])
         else:
             # get its previous domain value, if it changes, rename virtualhost file
