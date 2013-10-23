@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 
-# change this your home
-USER_HOME="/home/ball6847"
-
 # permission checking
-if [ "$(id -u)" != "0" ]; then
-   echo "You must run as root!" 1>&2
+if [ "$SUDO_USER" = "" ]; then
+   echo "You must run as root!, try using \"sudo $0\"" 1>&2
    exit 1
 fi
 
@@ -21,4 +18,4 @@ pip install virtualenvwrapper
 echo "
 export WORKON_HOME="\$HOME/.virtualenvs"
 source /usr/local/bin/virtualenvwrapper.sh
-" >> $USER_HOME/.bashrc
+" >> $HOME/.bash_aliases
