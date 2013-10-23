@@ -1,14 +1,14 @@
 <VirtualHost *:80>
     ServerName localhost
-    DocumentRoot /home/ball6847/webstack/core/webstack/
+    DocumentRoot "{{ WEBSTACK_ROOT }}/core/webstack/"
     
     # 3rdparty software
     ProxyPass /phpmyadmin !
-    Alias /phpmyadmin /home/ball6847/webstack/core/phpmyadmin
+    Alias /phpmyadmin "{{ WEBSTACK_ROOT }}/core/phpmyadmin"
     
     # webstack static files
     ProxyPass /static !
-    Alias /static /home/ball6847/webstack/core/webstack/static
+    Alias /static "{{ WEBSTACK_ROOT }}/core/webstack/static"
     
     ProxyPass / http://127.0.0.1:6847/
     ProxyPassReverse / http://127.0.0.1:6847/
@@ -18,7 +18,7 @@
 		AllowOverride None
 	</Directory>
     
-    <Directory /home/ball6847/webstack/core>
+    <Directory "{{ WEBSTACK_ROOT }}/core">
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Order allow,deny
@@ -29,6 +29,6 @@
     </Directory>
     
     LogLevel warn
-    ErrorLog /home/ball6847/webstack/logs/core/error.log
-    CustomLog /home/ball6847/webstack/logs/core/access.log combined
+    ErrorLog "{{ WEBSTACK_ROOT }}/logs/core/error.log"
+    CustomLog "{{ WEBSTACK_ROOT }}/logs/core/access.log" combined
 </VirtualHost>
