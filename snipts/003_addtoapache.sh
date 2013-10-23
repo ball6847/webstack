@@ -30,11 +30,9 @@ fi
 
 echo "Apache config dir = $configdir"
 
-# generate config
-webstackconf="$(cat $WEBSTACK_ROOT/etc/apache2/templates/webstack.conf.tpl)"
-
-
-
+# generate config file using provided template
+webstackconf="$(cat $WEBSTACK_ROOT/etc/templates/webstack_apache2.conf)"
+echo "${webstackconf//\{\{ WEBSTACK_ROOT \}\}/$WEBSTACK_ROOT}" > $WEBSTACK_ROOT/etc/apache2/webstack.conf
 
 # for apache2.4, check if webstack.conf is already in conf directory or if it already enabled
 if [[ $configdir = "/etc/apache2/conf-available/" ]] && [[ ! -f "/etc/apache2/conf-enabled/webstack.conf" ]]; then
