@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PYIP_DOWNLOAD_CACHE="$HOME/.pyip"
+PYIP_DOWNLOAD_CACHE="$HOME/.pyip"
 
 while read package
 do

@@ -2,7 +2,7 @@
 
 # check root permission, use sudo only!
 if [[ $SUDO_USER = "" ]]; then
-    echo "error: root permission is required, try using \"sudo $0\""
+    echo "error: root permission is required, try using \"sudo $0\"" 1>&2
     exit 0
 fi
 
