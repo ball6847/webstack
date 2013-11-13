@@ -1,2 +1,4 @@
 *.komodoproject
 .komodotools
+
+/etc/apache2/webstack.conf
