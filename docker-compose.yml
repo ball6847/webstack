@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+  webstack:
+    image: alpine:edge
+    environment:
+      - TERM=xterm-256color
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./:/app
+    entrypoint: sh -c "while true; do sleep 3; done;"
+  apache:
+    image: httpd:2-alpine
+    environment:
+      - TERM=xterm-256color
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./etc/apache2/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./etc/apache2/conf.d/:/etc/webstack/conf.d
+      - ./etc/apache2/vhost.d/:/etc/webstack/vhost.d
+    volumes_from:
+      - php
+  dnsmasq:
+    image: andyshinn/dnsmasq:2.75
+    cap_add:
+      - NET_ADMIN
+  php:
+    image: matthewhartstonge/stackme-php7-fpm:latest
+    environment:
+      - TERM=xterm-256color
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./etc/apache2/htdocs:/usr/local/apache2/htdocs
+      - ./etc/php/conf.d/:/usr/local/etc/php/conf.d
+  mysql:
+    image: mariadb:10
+    volumes:
+      - /var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TERM=xterm-256color
+      - MYSQL_ROOT_PASSWORD=strongpasswordforroot
