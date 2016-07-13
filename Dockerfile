@@ -3,18 +3,20 @@ MAINTAINER Porawit Poboonma <ball6847@gmail.com>
 
 ADD ./ /app
 
-RUN apk add --update --no-cache gcc musl-dev python-dev py-pip bash wget ca-certificates openssl && \
-    sh -c "wget https://bootstrap.pypa.io/ez_setup.py -O - | python"
+ENV TERM=xterm-256color
+ENV COMPOSE_PROJECT_NAME=webstack
+ENV DOCKER_API_VERSION=1.22
+WORKDIR /app/core/webstack
 
-RUN cd /app/core/webstack && \
+
+RUN apk add --update --no-cache gcc musl-dev python-dev py-pip bash wget ca-certificates openssl docker && \
+    sh -c "wget https://bootstrap.pypa.io/ez_setup.py -O - | python" && \
     pip install -r requirements.txt && \
-    python manage.py migrate && \
-    python manage.py collectstatic --noinput && \
-    sh -c "echo \"
-from django.contrib.auth.models import User
-User.objects.create_superuser('admin', 'admim@domain.com', 'changethis987654321')
-\" | python manage.py shell > /dev/null 2>&1"
+    pip install docker-compose && \
+    apk del gcc musl-dev python-dev
 
-# RUN apl del gcc musl-dev python-dev 
+VOLUME [ "/var/lib/webstack/data", "/data/www", "/data/logs", "/data/vhosts" ]
 
-VOLUME ['/var/lib/webstack/data']
+EXPOSE 8000
+
+ENTRYPOINT sh -c "/app/core/webstack/entrypoint.sh"

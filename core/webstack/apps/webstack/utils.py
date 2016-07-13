@@ -14,17 +14,19 @@ def shell_exec(cmd):
 """ --------------------------------------------------------- """
 
 def update_hostfile():
+    return True
+
     # we need to import here or it will cause recursion
     from .models import Project
-    
+
     filename = "/etc/hosts"
     ip = "127.0.0.1"
     commentopen = "## webstack-start"
     commentclose = "## webstack-end"
-    
+
     # get all domain from all projects
     projects = Project.objects.filter(status=True).order_by('domain')
-    
+
     # create hostfile entries
     buff = []
     buff.append(commentopen)
@@ -32,36 +34,48 @@ def update_hostfile():
         buff.append(ip + " " + p.domain)
     buff.append(commentclose)
     buff = "\n".join(buff)
-    
+
     # add webstack entries to hostfile
     with open(filename, 'r+') as fp:
         cache = fp.read()
         fp.seek(0)
-        
+
         if cache.find(commentopen) == -1:
             cache = cache + "\n\n" + buff
         else:
             pattern = "%s.*%s" % (re.escape(commentopen), re.escape(commentclose))
             cache = re.sub(pattern, buff, cache, 1, re.DOTALL)
-        
+
         fp.write(cache)
         fp.close()
         return True
-    
+
     return False
 
 """ --------------------------------------------------------- """
 
 class Apache():
-    
+
     def start(self):
-        shell_exec(["service", "apache2", "restart"])
-        
+        shell_exec([
+            "docker-compose", "-f", "/app/docker-compose.yml", "exec", "apache",
+            "apachectl", "-k", "start"
+        ])
+
     def stop(self):
-        shell_exec(["service", "apache2", "restart"])
-        
+        shell_exec([
+            "docker-compose", "-f", "/app/docker-compose.yml", "exec", "apache",
+            "apachectl", "-k", "stop"
+        ])
+
     def reload(self):
-        shell_exec(["service", "apache2", "reload"])
+        shell_exec([
+            "docker-compose", "-f", "/app/docker-compose.yml", "exec", "apache",
+            "apachectl", "-k", "graceful"
+        ])
 
     def restart(self):
-        shell_exec(["service", "apache2", "restart"])
+        shell_exec([
+            "docker-compose", "-f", "/app/docker-compose.yml", "exec", "apache",
+            "apachectl", "-k", "restart"
+        ])

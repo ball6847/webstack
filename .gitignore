@@ -2,3 +2,9 @@
 .komodotools
 
 /etc/apache2/webstack.conf
+
+/data/www/*
+/data/vhosts/*
+/data/logs/*
+
+!.gitkeep

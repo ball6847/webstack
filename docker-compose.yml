@@ -2,14 +2,15 @@ version: '2'
 
 services:
   webstack:
-    image: alpine:edge
+    build: ./
     environment:
-      - TERM=xterm-256color
+      - TZ=Asia/Bangkok
+      - DOCKER_API_VERSION=1.22
     volumes:
-      - /etc/localtime:/etc/localtime:ro
       - ./:/app
-      - /var/lib/webstack/data
-    entrypoint: sh -c "while true; do sleep 3; done;"
+      - /var/run/docker.sock:/var/run/docker.sock
+    volumes_from:
+      - apache
   apache:
     image: httpd:2-alpine
     environment:
@@ -17,8 +18,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./etc/apache2/httpd.conf:/usr/local/apache2/conf/httpd.conf
-      - ./etc/apache2/conf.d/:/etc/webstack/conf.d
-      - ./etc/apache2/vhost.d/:/etc/webstack/vhost.d
+      - ./data/vhosts:/data/vhosts
     volumes_from:
       - php
   dnsmasq:
@@ -31,7 +31,8 @@ services:
       - TERM=xterm-256color
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./etc/apache2/htdocs:/usr/local/apache2/htdocs
+      - ./data/logs:/data/logs
+      - ./data/www:/data/www
       - ./etc/php/conf.d/:/usr/local/etc/php/conf.d
   mysql:
     image: mariadb:10

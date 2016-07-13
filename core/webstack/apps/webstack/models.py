@@ -22,24 +22,25 @@ class Project(TimeStampedModel):
     path   = models.CharField(max_length=255,
                               blank=True)
     status = models.BooleanField(default=True)
-    
+
     _unipath = None
-    
+
     def __unicode__(self):
         return self.domain
-    
+
     """ --------------------------------------------------------- """
-    
+
     def save(self, *args, **kwargs):
+        self.path = Path('/data/www', self.safe_domain_name())
+
         # create directory before create object
         if self.pk == None:
-            path = Path(self.path)
             # @todo do not allowed create on root permission
-            if not path.isdir():
+            if not self.path.isdir():
                 uid = 0
                 gid = 0
                 # find uid and gid of closest parent directory
-                iterator = path.ancestor(1)
+                iterator = self.path.ancestor(1)
                 component = len(iterator.components())
                 for i in xrange(component):
                     if iterator.isdir():
@@ -49,8 +50,8 @@ class Project(TimeStampedModel):
                         break
                     iterator = iterator.ancestor(1)
                 # create all neccesary files and directories
-                path.child('public').mkdir(True)
-                path.child('logs').mkdir(True)
+                self.path.child('public').mkdir(True)
+                self.path.child('logs').mkdir(True)
                 self.apache_vhost_file().write_file('')
                 self.apache_access_log().write_file('')
                 self.apache_error_log().write_file('')
@@ -64,14 +65,14 @@ class Project(TimeStampedModel):
             old = Project.objects.get(pk=self.pk)
             if self.domain != old.domain:
                 old.apache_vhost_file().rename(self.apache_vhost_file())
-            
+
         # update database, /etc/hosts and apache virtualhost then reload apache
         super(Project, self).save(*args, **kwargs)
         update_hostfile()
         self.apache_vhost_file().write_file(
             render_to_string("vhost.html", {'project': self}))
         Apache().reload()
-    
+
     def clean_all(self, *args, **kwargs):
         self.apache_vhost_file().remove()
         self.get_path().rmtree()
@@ -79,7 +80,7 @@ class Project(TimeStampedModel):
         Apache().reload()
 
     def safe_domain_name(self):
-        return re.sub(r"\.+", "_", self.domain)
+        return re.sub(r"[^a-zA-Z0-9\.\-]+", "-", self.domain)
 
     def get_path(self):
         if self._unipath == None :
@@ -90,16 +91,14 @@ class Project(TimeStampedModel):
         return Path(self.path).child('public')
 
     def apache_vhost_file(self):
-        return Path(
-            settings.WEBSTACK_ROOT,
-            'etc/apache2/conf.d/%s.conf' % self.safe_domain_name())
+        return Path('/data/vhosts/%s.conf' % self.safe_domain_name())
 
     def apache_access_log(self):
         return self.get_path().child('logs', 'access.log')
-    
+
     def apache_error_log(self):
         return self.get_path().child('logs', 'error.log')
-    
+
     def php_error_log(self):
         return self.get_path().child('logs', 'error-php.log')
 

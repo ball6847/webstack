@@ -1,28 +1,31 @@
 <VirtualHost *:80>
-    ServerName {{ project.domain }}
-    DocumentRoot {{ project.document_root }}
-    
-	<Directory />
-		Options +FollowSymLinks
-		AllowOverride None
-	</Directory>
-    
-    <Directory "{{ project.path }}">
-        Options -Indexes +FollowSymLinks
-        AllowOverride All
-        Order allow,deny
-        allow from all
-        <IfVersion >= 2.4>
-        Require all granted
-        </IfVersion> 
-    </Directory>
-    
-    LogLevel warn
-    ErrorLog {{ project.apache_error_log }}
-    CustomLog {{ project.apache_access_log }} combined
-	
-	# these values can be overridden from .htaccess
-	php_flag log_errors On
-	php_flag display_errors On
-	php_value error_log "{{ project.php_error_log }}"
+  ServerName {{ project.domain }}
+  DocumentRoot {{ project.document_root }}
+
+  <Directory />
+    Options +FollowSymLinks
+    AllowOverride None
+  </Directory>
+
+  <Directory "{{ project.path }}">
+    Options -Indexes +FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    allow from all
+    <IfVersion >= 2.4>
+      Require all granted
+    </IfVersion>
+  </Directory>
+
+  LogLevel alert rewrite:trace3
+  ErrorLog {{ project.apache_error_log }}
+  CustomLog {{ project.apache_access_log }} combined
+
+  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://php:9000{{ project.path }}/public/$1
+  DirectoryIndex index.html index.php
+
+  # these values can be overridden from .htaccess
+  #php_flag log_errors On
+  #php_flag display_errors On
+  #php_value error_log "{ project.php_error_log }"
 </VirtualHost>
