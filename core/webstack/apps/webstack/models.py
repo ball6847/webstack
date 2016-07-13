@@ -68,7 +68,7 @@ class Project(TimeStampedModel):
 
         # update database, /etc/hosts and apache virtualhost then reload apache
         super(Project, self).save(*args, **kwargs)
-        update_hostfile()
+        #update_hostfile()
         self.apache_vhost_file().write_file(
             render_to_string("vhost.html", {'project': self}))
         Apache().reload()

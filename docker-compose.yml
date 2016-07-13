@@ -7,7 +7,7 @@ services:
       - TZ=Asia/Bangkok
       - DOCKER_API_VERSION=1.22
     volumes:
-      - ./:/app
+      # - ./:/app
       - /var/run/docker.sock:/var/run/docker.sock
     volumes_from:
       - apache
@@ -21,10 +21,6 @@ services:
       - ./data/vhosts:/data/vhosts
     volumes_from:
       - php
-  dnsmasq:
-    image: andyshinn/dnsmasq:2.75
-    cap_add:
-      - NET_ADMIN
   php:
     image: matthewhartstonge/stackme-php7-fpm:latest
     environment:
@@ -37,8 +33,16 @@ services:
   mysql:
     image: mariadb:10
     volumes:
-      - /var/lib/mysql
       - /etc/localtime:/etc/localtime:ro
+      - ./data/mysql:/var/lib/mysql
     environment:
       - TERM=xterm-256color
       - MYSQL_ROOT_PASSWORD=strongpasswordforroot
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.6.3-1
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=strongpasswordforroot
+      - PHP_UPLOAD_MAX_FILESIZE=64MB
