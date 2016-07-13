@@ -27,6 +27,6 @@
   ProxyPassReverse /phpmyadmin/ http://phpmyadmin/
 
   # php-fpm
-  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://php:9000/data/www/test.dev/public/$1
+  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://php:9000{{ project.document_root }}/$1
   DirectoryIndex index.html index.php
 </VirtualHost>
