@@ -6,6 +6,7 @@ services:
     environment:
       - TZ=Asia/Bangkok
     volumes:
+      - ./data/webstack:/var/lib/webstack/data
       - /var/run/docker.sock:/var/run/docker.sock
     volumes_from:
       - apache

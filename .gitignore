@@ -7,5 +7,6 @@
 /data/vhosts/*
 /data/logs/*
 /data/mysql/*
+/data/webstack/*
 
 !.gitkeep
