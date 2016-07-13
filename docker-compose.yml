@@ -3,6 +3,8 @@ version: '2'
 services:
   webstack:
     image: ball6847/webstack:latest
+    ports:
+      - 8000
     environment:
       - TZ=Asia/Bangkok
     volumes:
@@ -12,6 +14,8 @@ services:
       - apache
   apache:
     image: httpd:2-alpine
+    ports:
+      - 80
     environment:
       - TERM=xterm-256color
     volumes:
