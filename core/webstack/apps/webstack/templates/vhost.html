@@ -21,11 +21,12 @@
   ErrorLog {{ project.apache_error_log }}
   CustomLog {{ project.apache_access_log }} combined
 
-  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://php:9000{{ project.path }}/public/$1
-  DirectoryIndex index.html index.php
+  # phpmyadmin
+  Redirect /phpmyadmin /phpmyadmin/
+  ProxyPass /phpmyadmin/ http://phpmyadmin/
+  ProxyPassReverse /phpmyadmin/ http://phpmyadmin/
 
-  # these values can be overridden from .htaccess
-  #php_flag log_errors On
-  #php_flag display_errors On
-  #php_value error_log "{ project.php_error_log }"
+  # php-fpm
+  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://php:9000/data/www/test.dev/public/$1
+  DirectoryIndex index.html index.php
 </VirtualHost>

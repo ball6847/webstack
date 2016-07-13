@@ -6,7 +6,6 @@ services:
     environment:
       - TZ=Asia/Bangkok
     volumes:
-      # - ./:/app
       - /var/run/docker.sock:/var/run/docker.sock
     volumes_from:
       - apache
