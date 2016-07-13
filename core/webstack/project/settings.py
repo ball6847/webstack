@@ -115,7 +115,7 @@ ROOT_URLCONF = 'project.urls'
 WSGI_APPLICATION = 'project.wsgi.application'
 
 TEMPLATE_DIRS = (
-    APPS_ROOT.child('webstack', 'templates')
+    APPS_ROOT.child('webstack', 'templates'),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -130,7 +130,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'grappelli',
     'django.contrib.admin',
-    'south',
     'apps.webstack',
 )
 
@@ -170,4 +169,5 @@ LOGGING = {
 try:
     from settings_local import *
 except:
+    print 'wtf'
     pass

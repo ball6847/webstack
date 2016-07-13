@@ -8,6 +8,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./:/app
+      - /var/lib/webstack/data
     entrypoint: sh -c "while true; do sleep 3; done;"
   apache:
     image: httpd:2-alpine
