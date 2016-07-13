@@ -6,5 +6,6 @@
 /data/www/*
 /data/vhosts/*
 /data/logs/*
+/data/mysql/*
 
 !.gitkeep

@@ -2,10 +2,9 @@ version: '2'
 
 services:
   webstack:
-    build: ./
+    image: ball6847/webstack:latest
     environment:
       - TZ=Asia/Bangkok
-      - DOCKER_API_VERSION=1.22
     volumes:
       # - ./:/app
       - /var/run/docker.sock:/var/run/docker.sock
