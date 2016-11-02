@@ -6,7 +6,7 @@ services:
     ports:
       - 8000:8000
     environment:
-      - TZ=Asia/Bangkok
+      TZ: "Asia/Bangkok"
     volumes:
       - ./data/webstack:/var/lib/webstack/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -17,7 +17,7 @@ services:
     ports:
       - 80:80
     environment:
-      - TERM=xterm-256color
+      TERM: "xterm-256color"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./etc/apache2/httpd.conf:/usr/local/apache2/conf/httpd.conf
@@ -25,26 +25,26 @@ services:
     volumes_from:
       - php
   php:
-    image: matthewhartstonge/stackme-php7-fpm:latest
+    image: ball6847/php-fpm:5.6
     environment:
-      - TERM=xterm-256color
+      TERM: "xterm-256color"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./data/logs:/data/logs
       - ./data/www:/data/www
-      - ./etc/php/conf.d/:/usr/local/etc/php/conf.d
+      # - ./etc/php/conf.d/:/usr/local/etc/php/conf.d
   mysql:
     image: mariadb:10
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./data/mysql:/var/lib/mysql
     environment:
-      - TERM=xterm-256color
-      - MYSQL_ROOT_PASSWORD=strongpasswordforroot
+      TERM: "xterm-256color"
+      MYSQL_ROOT_PASSWORD: "strongpasswordforroot"
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     environment:
-      - PMA_HOSTS=mysql
-      - PMA_USER=root
-      - PMA_PASSWORD=strongpasswordforroot
-      - PHP_UPLOAD_MAX_FILESIZE=64M
+      PMA_HOSTS: "mysql"
+      PMA_USER: "root"
+      PMA_PASSWORD: "strongpasswordforroot"
+      PHP_UPLOAD_MAX_FILESIZE: "64M"
